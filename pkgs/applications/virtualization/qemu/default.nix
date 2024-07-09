@@ -77,7 +77,7 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optionals stdenv.isDarwin [ sigtool ];
 
   buildInputs = [ dtc zlib glib pixman
-    vde2 texinfo lzo snappy libtasn1
+    vde2 lzo snappy libtasn1
     gnutls nettle curl libslirp
   ]
     ++ lib.optionals ncursesSupport [ ncurses ]
