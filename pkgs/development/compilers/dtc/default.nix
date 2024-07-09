@@ -67,7 +67,7 @@ stdenv.mkDerivation (finalAttrs: {
       rev = "822123856980f84562406cc7bd1d4d6c2b8bc184";
       hash = "sha256-IJpRgP3pP8Eewx2PNKxhXZdsnomz2AR6oOsun50qAms=";
     })
-  ];
+  ] ++ lib.optional stdenv.hostPlatform.isStatic ./fixstatic.patch;
 
   env.SETUPTOOLS_SCM_PRETEND_VERSION = finalAttrs.version;
 
