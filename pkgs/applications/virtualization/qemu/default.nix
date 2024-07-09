@@ -114,6 +114,7 @@ stdenv.mkDerivation (finalAttrs: {
   separateDebugInfo = !(stdenv.isAarch64 && stdenv.isLinux);
 
   patches = [
+    ./crc.patch
     ./fix-qemu-ga.patch
 
     # QEMU upstream does not demand compatibility to pre-10.13, so 9p-darwin
@@ -134,7 +135,12 @@ stdenv.mkDerivation (finalAttrs: {
       revert = true;
     })
   ]
-  ++ lib.optional nixosTestRunner ./force-uid0-on-9p.patch;
+  ++ lib.optional nixosTestRunner ./force-uid0-on-9p.patch
+  ## FIXME: libaio does not provide a pkg-info file;
+  # and meson does not support static libraries lookup path using -L, relying on LIBRARY_PATH (https://github.com/mesonbuild/meson/issues/10172);
+  # and musl-gcc does not support LIBRARY_PATH overrides (https://www.openwall.com/lists/musl/2017/02/22/7);
+  # so we have to patch the meson.build to add the libaio path to the search path manually.
+  ++ lib.optional stdenv.hostPlatform.isStatic ./aio-fdt-find-static-library.patch;
 
   postPatch = ''
     # Otherwise tries to ensure /var/run exists.
@@ -182,7 +188,13 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optional smbdSupport "--smbd=${samba}/bin/smbd"
     ++ lib.optional uringSupport "--enable-linux-io-uring"
     ++ lib.optional canokeySupport "--enable-canokey"
-    ++ lib.optional capstoneSupport "--enable-capstone";
+    ++ lib.optional capstoneSupport "--enable-capstone"
+    ++ lib.optionals stdenv.hostPlatform.isStatic [
+      "--static"
+      "-Dlinux_aio_path=${libaio}/lib"
+      "-Dlinux_fdt_path=${dtc}/lib"
+    ];
+  dontAddStaticConfigureFlags = true;
 
   dontWrapGApps = true;
 
