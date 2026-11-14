@@ -21,7 +21,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "NetworkConfiguration";
     repo = "dhcpcd";
     rev = "v${finalAttrs.version}";
-    sha256 = "sha256-lrV6SaB/HmTptZigZ1Lf28eUPz0igxyT6omZwXDSuGM=";
+    hash = "sha256-lrV6SaB/HmTptZigZ1Lf28eUPz0igxyT6omZwXDSuGM=";
   };
 
   nativeBuildInputs = [ pkg-config ];
